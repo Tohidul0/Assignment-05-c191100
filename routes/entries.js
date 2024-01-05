@@ -2,13 +2,13 @@ var express = require("express");
 const db = require("../database");
 var router = express.Router();
 
-router.get("/", async function (req, res) {
-    // fetch data from postgres
-    const result = await db.query("SELECT * FROM entries;");
+// router.get("/", async function (req, res) {
+//     // fetch data from postgres
+//     const result = await db.query("SELECT * FROM entries;");
 
-    // send the data as response
-    res.send(result.rows);
-});
+//     // send the data as response
+//     res.send(result.rows);
+// });
 
 router.post("/", async function (req, res) {
     // read data from client
@@ -42,11 +42,26 @@ router.post("/", async function (req, res) {
     res.send(result.rows[0]);
 });
 
-router.patch("/:id", async function (req, res) {
-    res.send({});
-});
 
-// GET /:id - get single entry
+
+// GET /:id - get single entry---------------task1------------------------------
+router.get("/:id", async function (req, res){
+    const entryId = req.params.id;
+    console.log(entryId)
+
+    // fetch data from the database for the specified ID
+    const result = await db.query("SELECT * FROM entries WHERE id = $1;", [entryId]);
+
+    if (result.rows.length === 0) {
+        return res.status(404).send({
+            errorType: "NOT_FOUND_ERROR",
+            message: "Entry not found",
+        });
+    }
+
+    // send the entry as response
+    res.send(result.rows[0]);
+});
 // PATCH /:id - update single entry
 // DELTE /:id - delete single entry
 
